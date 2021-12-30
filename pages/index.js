@@ -1,8 +1,94 @@
 import Head from 'next/head'
 import Image from 'next/image'
+import { useState, useEffect } from 'react'
+
 import styles from '../styles/Home.module.css'
 
+const generatePuzzles = () => {
+  const initPuzzles = [
+    {
+      label: '❄️',
+      value: 0,
+    },
+    {
+      label: '🥁',
+      value: 1,
+    },
+    {
+      label: '🎉',
+      value: 2,
+    },
+    {
+      label: '🎊',
+      value: 3,
+    },
+    {
+      label: '🎁',
+      value: 4,
+    },
+    {
+      label: '🎀',
+      value: 5,
+    },
+    {
+      label: '🎄',
+      value: 6,
+    },
+    {
+      label: '🥴',
+      value: 7,
+    },
+  ];
+  const puzzles = [...initPuzzles, ...initPuzzles];
+  puzzles.sort(() => Math.random() - 0.5);
+
+  return puzzles;
+}
+
+const puzzles = generatePuzzles();
+
 export default function Home() {
+  const [movement, setMovement] = useState(0);
+  const [selectedIndexes, setSelectedIndexes] = useState([]);
+  const [selectedValues, setSelectedValues] = useState([]);
+  const [successPairs, setSuccessPairs] = useState([]);
+  const [isWaiting, setIsWaiting] = useState(true);
+
+  const handleSelectPuzzle = (index, value) => {
+    if ([...selectedIndexes, ...successPairs].includes(index)) {
+      return;
+    }
+
+    if (selectedIndexes.length >= 2) {
+      return;
+    }
+
+    setSelectedIndexes([...selectedIndexes, index]);
+    setSelectedValues([...selectedValues, value]);
+  }
+
+  useEffect(() => {
+    if (!selectedIndexes.length || selectedIndexes.length === 1) {
+      return;
+    }
+
+    if (!isWaiting) {
+      if (selectedValues[0] === selectedValues[1]) {
+        setSuccessPairs([...successPairs, ...selectedIndexes]);
+      }
+
+      setMovement(movement + 1);
+      setSelectedIndexes(() => []);
+      setSelectedValues(() => []);
+      setIsWaiting(true);
+    } else {
+      setTimeout(() => {
+        setIsWaiting(false);
+      }, 500);
+    }
+
+  }, [selectedIndexes, selectedValues, movement, successPairs, isWaiting]);
+
   return (
     <div className={styles.container}>
       <Head>
@@ -12,58 +98,34 @@ export default function Home() {
       </Head>
 
       <main className={styles.main}>
-        <h1 className={styles.title}>
+        <h1 className="text-center text-4xl font-bold text-green-700 mb-20">
           Welcome to my website!
         </h1>
 
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.js</code>
-        </p>
-
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h2>Documentation &rarr;</h2>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h2>Learn &rarr;</h2>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className={styles.card}
-          >
-            <h2>Examples &rarr;</h2>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h2>Deploy &rarr;</h2>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
+        <div className='grid grid-cols-2 gap-4 mb-4'>
+          <h1>Pair matched: {successPairs.length/2}/{puzzles.length/2}</h1>
+          <h1>Total moves: {movement}</h1>
+        </div>
+        <div className='grid grid-cols-4 grid-rows-4 gap-4'>
+          {puzzles.map((symbol, index) => (
+            <button
+              className={`${[...successPairs, ...selectedIndexes].includes(index) ? 'bg-green-400' : ''} p-4 bg-transparent border-[2px] border-solid border-gray-400 rounded-md hover:border-green-500 hover:bg-green-500 hover:text-white`}
+              key={index}
+              onClick={() => handleSelectPuzzle(index, symbol.value)}
+            >
+              <div
+                className="text-center flex items-center justify-center"
+              >
+                <span className="text-3xl" role="img" aria-label="snowflake" aria-hidden="false">
+                  {[...successPairs, ...selectedIndexes].includes(index) ? symbol.label : '❓'}
+                </span>
+              </div>
+            </button>
+          ))}
         </div>
       </main>
 
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <span className={styles.logo}>
-            <Image src="/vercel.svg" alt="Vercel Logo" width={72} height={16} />
-          </span>
-        </a>
-      </footer>
+      <footer className={styles.footer}>Powered by Toan Ho</footer>
     </div>
   )
 }
