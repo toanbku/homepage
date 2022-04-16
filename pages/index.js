@@ -1,49 +1,15 @@
-import Head from 'next/head'
-import Image from 'next/image'
-import { useState, useEffect } from 'react'
+import Head from "next/head";
+import { useState, useEffect } from "react";
+import { PUZZLES } from "../constants/puzzle";
 
-import styles from '../styles/Home.module.css'
+import styles from "../styles/Home.module.css";
 
 const generatePuzzles = () => {
-  const initPuzzles = [
-    {
-      label: '❄️',
-      value: 0,
-    },
-    {
-      label: '🥁',
-      value: 1,
-    },
-    {
-      label: '🎉',
-      value: 2,
-    },
-    {
-      label: '🎊',
-      value: 3,
-    },
-    {
-      label: '🎁',
-      value: 4,
-    },
-    {
-      label: '🎀',
-      value: 5,
-    },
-    {
-      label: '🎄',
-      value: 6,
-    },
-    {
-      label: '🥴',
-      value: 7,
-    },
-  ];
-  const puzzles = [...initPuzzles, ...initPuzzles];
+  const puzzles = [...PUZZLES, ...PUZZLES];
   puzzles.sort(() => Math.random() - 0.5);
 
   return puzzles;
-}
+};
 
 const puzzles = generatePuzzles();
 
@@ -65,7 +31,7 @@ export default function Home() {
 
     setSelectedIndexes([...selectedIndexes, index]);
     setSelectedValues([...selectedValues, value]);
-  }
+  };
 
   useEffect(() => {
     if (!selectedIndexes.length || selectedIndexes.length === 1) {
@@ -86,7 +52,6 @@ export default function Home() {
         setIsWaiting(false);
       }, 500);
     }
-
   }, [selectedIndexes, selectedValues, movement, successPairs, isWaiting]);
 
   return (
@@ -102,22 +67,33 @@ export default function Home() {
           Welcome to my website!
         </h1>
 
-        <div className='grid grid-cols-2 gap-4 mb-4'>
-          <h1>Pair matched: {successPairs.length/2}/{puzzles.length/2}</h1>
+        <div className="grid grid-cols-2 gap-4 mb-4">
+          <h1>
+            Pair matched: {successPairs.length / 2}/{puzzles.length / 2}
+          </h1>
           <h1>Total moves: {movement}</h1>
         </div>
-        <div className='grid grid-cols-4 grid-rows-4 gap-4'>
+        <div className="grid grid-cols-4 grid-rows-4 gap-4">
           {puzzles.map((symbol, index) => (
             <button
-              className={`${[...successPairs, ...selectedIndexes].includes(index) ? 'bg-green-400' : ''} p-4 bg-transparent border-[2px] border-solid border-gray-400 rounded-md hover:border-green-500 hover:bg-green-500 hover:text-white`}
+              className={`${
+                [...successPairs, ...selectedIndexes].includes(index)
+                  ? "bg-green-400"
+                  : ""
+              } p-4 bg-transparent border-[2px] border-solid border-gray-400 rounded-md hover:border-green-500 hover:bg-green-500 hover:text-white`}
               key={index}
               onClick={() => handleSelectPuzzle(index, symbol.value)}
             >
-              <div
-                className="text-center flex items-center justify-center"
-              >
-                <span className="text-3xl" role="img" aria-label="snowflake" aria-hidden="false">
-                  {[...successPairs, ...selectedIndexes].includes(index) ? symbol.label : '❓'}
+              <div className="text-center flex items-center justify-center">
+                <span
+                  className="text-3xl"
+                  role="img"
+                  aria-label="snowflake"
+                  aria-hidden="false"
+                >
+                  {[...successPairs, ...selectedIndexes].includes(index)
+                    ? symbol.label
+                    : "❓"}
                 </span>
               </div>
             </button>
@@ -127,5 +103,5 @@ export default function Home() {
 
       <footer className={styles.footer}>Powered by Toan Ho</footer>
     </div>
-  )
+  );
 }
